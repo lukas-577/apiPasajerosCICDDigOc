@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.name }}
+  name: api-pasajeros
   labels:
-    app: {{ .Values.name }}
+    app: api-pasajeros
 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Values.name }}
+      app: api-pasajeros
   template:
     metadata:
       labels:
-        app: {{ .Values.name }}
+        app: api-pasajeros
     spec:
       containers:
-      - name: {{ .Values.name }}
+      - name: api-pasajeros
         image: <IMAGE>
         ports:
 
