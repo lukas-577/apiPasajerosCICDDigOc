@@ -50,12 +50,13 @@ jobs:
 
 
 
-    - name: Deploy to DigitalOcean App Platform
-      uses: digitalocean/app-platform-action@v0.3.0
+    - name: DigitalOcean App Platform deployment
+      uses: digitalocean/app_action@main
       with:
-          app_id: ${{ env.APP_ID }}
-          api_token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          source_dir: . # Or specify the directory where your Dockerfile is located
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          wait: true
-      
+          app_name: ${{ env.EXAMPLE_NAME}}
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          images: '[{
+                      "name": "poslumonidy",
+                      "registry.digitalocean.com/${{ secrets.REGISTRY_NAME }}/$EXAMPLE_NAME:<IMAGE>"
+                    }
+                  ]'
