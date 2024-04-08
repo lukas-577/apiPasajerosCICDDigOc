@@ -8,6 +8,7 @@ on:
 
 env:
   EXAMPLE_NAME: "example"
+  APP_ID: "gdg57"
 
 
 jobs:
@@ -49,6 +50,12 @@ jobs:
 
 
 
-    - name: Deploy to DigitalOcean Kubernetes
-      run: |-
-        kubectl apply -f deploy/k8s/deployment.yaml
+    - name: Deploy to DigitalOcean App Platform
+      uses: digitalocean/app-platform-action@v0.3.0
+      with:
+          app_id: ${{ env.APP_ID }}
+          api_token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          source_dir: . # Or specify the directory where your Dockerfile is located
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          wait: true
+      
