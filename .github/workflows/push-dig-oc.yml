@@ -1,0 +1,57 @@
+name: Push image to Digital Ocean Container Registry
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  EXAMPLE_NAME: "example"
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Install doctl.
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+    - name: Authenticate with DigitalOcean
+      run: |
+        echo "${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}" | doctl auth login --context=main
+
+    - name: Build the alpine-based docker image
+      run: |-
+        docker build . --file Dockerfile -t "gcr.io/${{ secrets.REGISTRY_NAME }}/$EXAMPLE_NAME:$GITHUB_SHA"
+
+    - name: Log in to DigitalOcean Container Registry with short-lived credentials
+      run: doctl registry login --expiry-seconds 1200
+
+
+    - name: Push the image to the DigitalOcean Container Registry
+      run: |-
+        docker push "${{ secrets.REGISTRY_NAME }}/$EXAMPLE_NAME:$GITHUB_SHA"
+
+
+    
+    # Deploy to DigitalOCcean Kubernetes.
+    # Update the deployment file with the image name.
+    - name: Update deployment file
+      run: |-
+        sed -i "s|<IMAGE>|registry.digitalocean.com/${{ secrets.REGISTRY_NAME }}/$EXAMPLE_NAME:$GITHUB_SHA|g" deploy/k8s/deployment.yaml
+
+    - name: Save DigitalOcean kubeconfig with short-lived credentials
+      run: |-
+        doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.CLUSTER_NAME }}
+
+
+    - name: Deploy to DigitalOcean Kubernetes
+      run: |-
+        kubectl apply -f deploy/k8s/deployment.yaml
