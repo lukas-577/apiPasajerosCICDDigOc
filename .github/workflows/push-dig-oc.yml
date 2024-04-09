@@ -9,7 +9,7 @@ on:
 env:
   EXAMPLE_NAME: "example"
   APP_ID: "gdg57"
-  APP_NAME: "poslumonidy"
+  APP_NAME: "prueba"
 
 
 jobs:
