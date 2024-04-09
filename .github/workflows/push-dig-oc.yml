@@ -9,6 +9,7 @@ on:
 env:
   EXAMPLE_NAME: "example"
   APP_ID: "gdg57"
+  APP_NAME: "poslumonidy"
 
 
 jobs:
@@ -53,10 +54,15 @@ jobs:
     - name: DigitalOcean App Platform deployment
       uses: digitalocean/app_action@main
       with:
-          app_name: ${{ env.EXAMPLE_NAME}}
+          app_name: ${{ env.APP_NAME}}
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          images: '[{
-                      "name": "poslumonidy",
-                      "registry.digitalocean.com/${{ secrets.REGISTRY_NAME }}/$EXAMPLE_NAME:<IMAGE>"
-                    }
+          image: '[
+                    {
+                      "name": ${{ env.EXAMPLE_NAME }},
+                      "image":{
+                        "registry_type": "DOKER_HUB",
+                        "repository": "registry.digitalocean.com/${{ secrets.REGISTRY_NAME }}/$EXAMPLE_NAME",
+                        "tag": "<IMAGE>"  
+                      }
+                    },
                   ]'
